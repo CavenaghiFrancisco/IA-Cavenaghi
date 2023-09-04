@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace IA.FSM.Villager
@@ -31,6 +32,8 @@ namespace IA.FSM.Villager
 
         private FSM fsm;
 
+        private List<Vector3> travelPositions;
+
         StateParameters collectParameters;
         StateParameters mineAndRetrieveParameters;
 
@@ -47,16 +50,16 @@ namespace IA.FSM.Villager
 
             fsm.SetRelation((int)States.Retrieve, (int)Flags.OnSeeTarget, (int)States.Collect);
 
-            collectParameters.Parameters = new object[3] { gameObject.transform, speed, Target };
+            collectParameters.Parameters = new object[4] { gameObject.transform, speed, Target, travelPositions };
             fsm.AddState<CollectState>((int)States.Collect,
-                collectParameters);
+                collectParameters,collectParameters);
 
-            mineAndRetrieveParameters.Parameters = new object[5] { gameObject.transform, speed, Target, resourcesCollected, Home };
+            mineAndRetrieveParameters.Parameters = new object[6] { gameObject.transform, speed, Target, resourcesCollected, Home, travelPositions };
             fsm.AddState<MineState>((int)States.Mine,
-                mineAndRetrieveParameters);
+                mineAndRetrieveParameters,mineAndRetrieveParameters);
 
             fsm.AddState<RetrieveState>((int)States.Retrieve,
-                mineAndRetrieveParameters);
+                mineAndRetrieveParameters, mineAndRetrieveParameters);
 
             fsm.SetCurrentStateForced((int)States.Collect);
         }
