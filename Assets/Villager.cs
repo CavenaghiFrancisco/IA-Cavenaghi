@@ -37,7 +37,7 @@ namespace IA.FSM.Villager
         StateParameters collectParameters;
         StateParameters mineAndRetrieveParameters;
 
-        private void Start()
+        private void Awake()
         {
             collectParameters = new StateParameters();
             mineAndRetrieveParameters = new StateParameters();
