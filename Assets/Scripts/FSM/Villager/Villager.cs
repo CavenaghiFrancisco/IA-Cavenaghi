@@ -25,6 +25,8 @@ namespace IA.FSM.Villager
     {
         public GameObject Target;
         public GameObject Home;
+        public VoronoiController voronoiCalculator;
+        public int mined = 0;
 
         private float speed = 5;
 
@@ -54,7 +56,7 @@ namespace IA.FSM.Villager
             fsm.AddState<CollectState>((int)States.Collect,
                 collectParameters,collectParameters);
 
-            mineAndRetrieveParameters.Parameters = new object[6] { gameObject.transform, speed, Target, resourcesCollected, Home, travelPositions };
+            mineAndRetrieveParameters.Parameters = new object[7] { gameObject.transform, speed, Target, resourcesCollected, Home, travelPositions, mined };
             fsm.AddState<MineState>((int)States.Mine,
                 mineAndRetrieveParameters,mineAndRetrieveParameters);
 

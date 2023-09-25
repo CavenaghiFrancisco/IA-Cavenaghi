@@ -1,18 +1,19 @@
+using MinerSimulator.Utils.Pathfinder;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IA.FSM.Villager
+namespace IA.FSM.Carriage
 {
-    public class RetrieveState : State
+    public class ReturnState : State
     {
         public override List<Action> GetBehaviours(StateParameters stateParameters)
         {
             Transform transform = stateParameters.Parameters[0] as Transform;
             float speed = Convert.ToSingle(stateParameters.Parameters[1]);
             GameObject Target = stateParameters.Parameters[2] as GameObject;
-            float resources = Convert.ToSingle(stateParameters.Parameters[3]);
+            float food = Convert.ToSingle(stateParameters.Parameters[3]);
             GameObject home = stateParameters.Parameters[4] as GameObject;
             List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
 
@@ -25,9 +26,9 @@ namespace IA.FSM.Villager
 
                 if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
                 {
-                    resources = 0;
-                    stateParameters.Parameters[3] = resources;
-                    Transition((int)Flags.OnSeeTarget);
+                    food = 10;
+                    stateParameters.Parameters[3] = food;
+                    Transition((int)Flags.OnSuplyMode);
                 }
                 if (Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
                 {
@@ -37,7 +38,7 @@ namespace IA.FSM.Villager
             }
             );
 
-            behabiours.Add(() => Debug.Log("RETRIEVE"));
+            behabiours.Add(() => Debug.Log("RETURN"));
 
             return behabiours;
         }
@@ -50,7 +51,7 @@ namespace IA.FSM.Villager
             List<Action> behaviours = new List<Action>();
             behaviours.Add(() =>
             {
-                stateParameters.Parameters[5] = PathFinder.FindPath(transform.position, home.transform.position);
+                stateParameters.Parameters[5] = PathFinder.FindPath(transform.position, home.transform.position, PawnType.CARRIAGE);
             });
             return behaviours;
         }
@@ -58,13 +59,11 @@ namespace IA.FSM.Villager
         public override List<Action> GetOnExitBehaviours(StateParameters stateParameters)
         {
             return new List<Action>();
-
         }
 
         public override void Transition(int flag)
         {
             SetFlag?.Invoke(flag);
-
         }
     }
 }
