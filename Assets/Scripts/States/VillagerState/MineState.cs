@@ -1,3 +1,4 @@
+using MinerSimulator.Utils.Pathfinder;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,13 +12,34 @@ namespace IA.FSM.Villager
             float speed = Convert.ToSingle(stateParameters.Parameters[1]);
             GameObject Target = stateParameters.Parameters[2] as GameObject;
             float resources = Convert.ToSingle(stateParameters.Parameters[3]);
-            int mined = Convert.ToInt32(stateParameters.Parameters[7]);
+            List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+            int mined = Convert.ToInt32(stateParameters.Parameters[6]);
+            VoronoiController voronoi = stateParameters.Parameters[7] as VoronoiController;
 
 
             List<Action> behaviours = new List<Action>();
             behaviours.Add(() =>
             {
-                if(mined < 3)
+                if (resources >= 15 || AdminOfGame.GetMap().MinesAvailable.Count <= 0 || VillagerAdmin.Emergency)
+                {
+                    Transition((int)Flags.OnHaveEnoughResources);
+                    return;
+                }
+                    
+                if (Target == null)
+                {
+                    voronoi.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                    Target = voronoi.GetMineCloser(transform.position).transform.gameObject;
+                    stateParameters.Parameters[2] = Target;
+                    travelPositions.Clear();
+                    travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
+                    stateParameters.Parameters[5] = travelPositions;
+                }
+                if(Vector3.Distance(transform.position, Target.transform.position) > 0.6f)
+                {
+                    Transition((int)Flags.OnMineDestroyed);
+                }
+                if (mined < 3 && Vector3.Distance(transform.position, Target.transform.position) < 0.5f)
                 {
                     resources += Target.GetComponent<Mine>().Take(1);
                     mined += 1;
@@ -29,11 +51,11 @@ namespace IA.FSM.Villager
                             mined = 0;
                         }
                     }
-                    stateParameters.Parameters[7] = mined;
+                    stateParameters.Parameters[6] = mined;
                     stateParameters.Parameters[3] = resources;
-                    if (resources >= 15)
-                        Transition((int)Flags.OnHaveEnoughResources);
+                    
                 }
+                
             });
             return behaviours;
         }

@@ -39,7 +39,7 @@ public class Sector
     }
 
     public void DrawSector()
-    {
+    {   
         Handles.color = color;
         Handles.DrawAAConvexPolygon(points);
 
@@ -93,7 +93,7 @@ public class Sector
     {
         for (int i = 0; i < limits.Count; i++)
         {
-            Vector2 origin = mine.transform.position;
+            Vector2 origin = new Vector2(mine.transform.position.x, mine.transform.position.z);
             Vector2 final = limits[i].GetOutsitePosition(origin);
 
             segments.Add(new Segment(origin, final));
@@ -120,7 +120,7 @@ public class Sector
             endX = endPoint.x; 
             endY = endPoint.y;
 
-            inside ^= (endY > point.y ^ startY > point.y) && ((point.x - endX) < (point.y - endY) * (startX - endX) / (startY - endY));
+            inside ^= (endY > point.z ^ startY > point.z) && ((point.x - endX) < (point.z - endY) * (startX - endX) / (startY - endY));
         }
 
         return inside;
@@ -193,9 +193,9 @@ public class Sector
         Vector2 intersection = Vector2.zero;
 
         Vector2 p1 = seg1.Mediatrix;
-        Vector2 p2 = seg1.Mediatrix + seg1.Direction * Mathf.Sqrt(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SizeX + AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SizeY);
+        Vector2 p2 = seg1.Mediatrix + seg1.Direction * Mathf.Sqrt((AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX/2f) * (AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) + (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) * (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f));
         Vector2 p3 = seg2.Mediatrix;
-        Vector2 p4 = seg2.Mediatrix + seg2.Direction * Mathf.Sqrt(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SizeX + AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SizeY);
+        Vector2 p4 = seg2.Mediatrix + seg2.Direction * Mathf.Sqrt((AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) * (AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) + (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) * (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f));
 
         if (((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)) == 0) return intersection;
 

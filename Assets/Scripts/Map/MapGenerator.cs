@@ -1,6 +1,7 @@
 using MinerSimulator.Utils.MapUtils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -12,12 +13,14 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private int spaceBetweenX = 1;
     [SerializeField] private int spaceBetweenY = 1;
     [SerializeField] private int minesQuantity = 1;
+    [SerializeField] private Button emergencyButton;
 
     public Node[,] grid;
     public int SizeX { get => sizeX; }
     public int SizeY { get => sizeY; }
     public int SpaceBetweenX { get => spaceBetweenX; }
     public int SpaceBetweenY { get => spaceBetweenY; }
+    public List<Mine> MinesAvailable { get => minesAvailable; }
 
     List<Mine> minesAvailable = new List<Mine>();
     VillagerAdmin homeAvailable;
@@ -40,6 +43,7 @@ public class MapGenerator : MonoBehaviour
             {
                 Node node = new Node { X = x * spaceBetweenX / 2f, Y = y * spaceBetweenY / 2f, isWalkable = true };
                 grid[x, y] = node;
+                if(!(x == sizeX || y == sizeY || x == 0 || y == 0))
                 unusedTiles.Add(new Vector3(node.X, 1, node.Y));
             }
         }
@@ -75,7 +79,7 @@ public class MapGenerator : MonoBehaviour
                 else if (grid[i, j].type == EntityType.HOME)
                 {
                     GameObject home = Instantiate(homePrefab, new Vector3(grid[i, j].X, 1, grid[i, j].Y), Quaternion.identity);
-                    homeAvailable = home.AddComponent<VillagerAdmin>();
+                    emergencyButton.onClick.AddListener(() => VillagerAdmin.SetEmergency());
                 }
             }
         }

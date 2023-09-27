@@ -1,5 +1,6 @@
 using IA.FSM.Carriage;
 using IA.FSM.Villager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,23 +11,37 @@ public class VillagerAdmin : MonoBehaviour
     public System.Collections.Concurrent.ConcurrentBag<Villager> villagers = new System.Collections.Concurrent.ConcurrentBag<Villager>();
     public System.Collections.Concurrent.ConcurrentBag<Carriage> carriages = new System.Collections.Concurrent.ConcurrentBag<Carriage>();
 
-    public List<Villager> villagersForBag;
-    public List<Carriage> carriagesForBag;
+    public GameObject villagerPrefab;
+    public GameObject carriagePrefab;
+    public int villagerQuantity = 3;
+    public int carriageQuantity = 1;
+
+    static bool emergency = false;
+
+    public static bool Emergency { get => emergency; }
+
+    public static Action OnEmergencyCalled;
 
     private void Start()
     {
-        foreach(Villager villager in villagersForBag)
+        for(int i = 0; i < villagerQuantity; i++) 
         {
-            villagers.Add(villager);
+            GameObject villagerAux = Instantiate(villagerPrefab, transform.position, Quaternion.identity);
+            villagers.Add(villagerAux.GetComponent<Villager>());
+            villagerAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+            villagerAux.GetComponent<Villager>().Home = this.gameObject;
+            villagerAux.GetComponent<Villager>().speed = UnityEngine.Random.Range(3,8);
         }
 
-        foreach (Carriage carriage in carriagesForBag)
+        for (int i = 0; i < carriageQuantity; i++)
         {
-            carriages.Add(carriage);
-
+            GameObject carriageAux = Instantiate(carriagePrefab, transform.position, Quaternion.identity);
+            carriages.Add(carriageAux.GetComponent<Carriage>());
+            carriageAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+            carriageAux.GetComponent<Villager>().Home = this.gameObject;
         }
 
-        ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 8 };
+        ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 3 };
 
         Parallel.ForEach(villagers, options, currentItem =>
         {
@@ -37,5 +52,11 @@ public class VillagerAdmin : MonoBehaviour
         {
             currentItem.Update();
         });
+    }
+
+    public static void SetEmergency()
+    {
+        emergency = !emergency;
+        OnEmergencyCalled();
     }
 }

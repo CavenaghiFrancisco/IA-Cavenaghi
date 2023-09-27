@@ -15,7 +15,9 @@ namespace IA.FSM.Villager
     {
         OnSeeTarget,
         OnNearTarget,
-        OnHaveEnoughResources
+        OnHaveEnoughResources,
+        OnMineDestroyed,
+        OnEmergency
     }
 }
 
@@ -28,7 +30,7 @@ namespace IA.FSM.Villager
         public VoronoiController voronoiCalculator;
         public int mined = 0;
 
-        private float speed = 5;
+        public float speed = 5;
 
         public float resourcesCollected = 0;
 
@@ -36,13 +38,19 @@ namespace IA.FSM.Villager
 
         private List<Vector3> travelPositions;
 
-        StateParameters collectParameters;
-        StateParameters mineAndRetrieveParameters;
+        StateParameters allParameters;
 
-        private void Awake()
+        private void Start()
         {
-            collectParameters = new StateParameters();
-            mineAndRetrieveParameters = new StateParameters();
+            Mine.OnMineDestroy += (bool areMines) =>
+            {
+                voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                if(!areMines)
+                    fsm.SetCurrentStateForced((int)States.Retrieve);
+            };
+            VillagerAdmin.OnEmergencyCalled += () => fsm.SetCurrentStateForced((int)States.Retrieve);
+            voronoiCalculator = GetComponent<VoronoiController>();
+            allParameters = new StateParameters();
 
             fsm = new FSM(Enum.GetValues(typeof(States)).Length, Enum.GetValues(typeof(Flags)).Length);
 
@@ -52,23 +60,40 @@ namespace IA.FSM.Villager
 
             fsm.SetRelation((int)States.Retrieve, (int)Flags.OnSeeTarget, (int)States.Collect);
 
-            collectParameters.Parameters = new object[4] { gameObject.transform, speed, Target, travelPositions };
-            fsm.AddState<CollectState>((int)States.Collect,
-                collectParameters,collectParameters);
+            fsm.SetRelation((int)States.Mine, (int)Flags.OnMineDestroyed, (int)States.Collect);
 
-            mineAndRetrieveParameters.Parameters = new object[7] { gameObject.transform, speed, Target, resourcesCollected, Home, travelPositions, mined };
+            fsm.SetRelation((int)States.Collect, (int)Flags.OnEmergency, (int)States.Retrieve);
+
+
+
+            allParameters.Parameters = new object[8] { gameObject.transform, speed, Target, resourcesCollected, Home, travelPositions, mined, voronoiCalculator };
             fsm.AddState<MineState>((int)States.Mine,
-                mineAndRetrieveParameters,mineAndRetrieveParameters);
+                allParameters,allParameters);
 
             fsm.AddState<RetrieveState>((int)States.Retrieve,
-                mineAndRetrieveParameters, mineAndRetrieveParameters);
+                allParameters, allParameters);
+
+            fsm.AddState<CollectState>((int)States.Collect,
+                allParameters, allParameters);
 
             fsm.SetCurrentStateForced((int)States.Collect);
         }
 
         public void Update()
         {
+            if(!(Vector3.Distance(transform.position,Home.transform.position) < 1 && AdminOfGame.GetMap().MinesAvailable.Count < 0))
             fsm.Update();
+        }
+
+        private void OnDestroy()
+        {
+            Mine.OnMineDestroy -= (bool areMines) =>
+            {
+                voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                fsm.SetCurrentStateForced((int)States.Retrieve);
+            };
+
+            VillagerAdmin.OnEmergencyCalled -= () => fsm.SetCurrentStateForced((int)States.Retrieve);
         }
     }
 }

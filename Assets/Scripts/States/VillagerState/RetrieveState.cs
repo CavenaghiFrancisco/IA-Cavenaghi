@@ -1,6 +1,5 @@
 using MinerSimulator.Utils.Pathfinder;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,18 +21,55 @@ namespace IA.FSM.Villager
 
             behabiours.Add(() =>
             {
-                transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
+                if (VillagerAdmin.Emergency)
+                {
+                    if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
+                    {
+                        transform.GetComponent<MeshRenderer>().enabled = false;
+                        resources = 0;
+                        stateParameters.Parameters[3] = resources;
+                        return;
+                    }
+                    if (Vector3.Distance(transform.position, home.transform.position) > 1.1f)
+                    {
+                        travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+                        if (travelPositions.Count > 0)
+                            transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
+                    }
 
-                if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
-                {
-                    resources = 0;
-                    stateParameters.Parameters[3] = resources;
-                    Transition((int)Flags.OnSeeTarget);
+                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                    {
+                        travelPositions.RemoveAt(0);
+                        stateParameters.Parameters[5] = travelPositions;
+                    }
                 }
-                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                else
                 {
-                    travelPositions.RemoveAt(0);
-                    stateParameters.Parameters[5] = travelPositions;
+                    transform.GetComponent<MeshRenderer>().enabled = true;
+                    travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+
+                    if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
+                    {
+                        if (AdminOfGame.GetMap().MinesAvailable.Count <= 0)
+                            return;
+                        resources = 0;
+                        stateParameters.Parameters[3] = resources;
+                        Transition((int)Flags.OnSeeTarget);
+                    }
+                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                    {
+                        travelPositions.RemoveAt(0);
+                        stateParameters.Parameters[5] = travelPositions;
+                    }
+                    if (Vector3.Distance(transform.position, home.transform.position) > 1.1f)
+                    {
+                        if(resources < 15)
+                        {
+                            Transition((int)Flags.OnSeeTarget);
+                        }
+                        if (travelPositions.Count > 0)
+                            transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
+                    }
                 }
             }
             );

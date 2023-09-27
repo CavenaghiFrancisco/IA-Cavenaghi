@@ -12,27 +12,43 @@ namespace IA.FSM.Villager
             Transform transform = stateParameters.Parameters[0] as Transform;
             float speed = Convert.ToSingle(stateParameters.Parameters[1]);
             GameObject Target = stateParameters.Parameters[2] as GameObject;
-            List<Vector3> travelPositions = stateParameters.Parameters[3] as List<Vector3>;
+            List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+            VoronoiController voronoi = stateParameters.Parameters[7] as VoronoiController;
 
             List<Action> behabiours = new List<Action>();
 
             behabiours.Add(() =>
             {
-                if (travelPositions == null)
+                if (AdminOfGame.GetMap().MinesAvailable.Count <= 0 || VillagerAdmin.Emergency)
                 {
-                    stateParameters.Parameters[3] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
-                    travelPositions = stateParameters.Parameters[3] as List<Vector3>;
+                    Transition((int)Flags.OnEmergency);
+                    return;
+                }
+
+                if (Target == null)
+                {
+                    voronoi.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                    Target = voronoi.GetMineCloser(transform.position).transform.gameObject;
+                    stateParameters.Parameters[2] = Target;
+                    travelPositions = new List<Vector3>();
+                    travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
+                    stateParameters.Parameters[5] = travelPositions;
+                }
+                if (travelPositions == null || travelPositions.Count <= 0)
+                {
+                    travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
+                    stateParameters.Parameters[5] = travelPositions;
                 }
                 transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
 
-                if (Vector3.Distance(transform.position, Target.transform.position) < 1.1f)
+                if (Vector3.Distance(transform.position, Target.transform.position) < 0.5f)
                 {
                     Transition((int)Flags.OnNearTarget);
                 }
                 if (Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
                 {
                     travelPositions.RemoveAt(0);
-                    stateParameters.Parameters[3] = travelPositions;
+                    stateParameters.Parameters[5] = travelPositions;
                 }
                 
             });
@@ -46,10 +62,24 @@ namespace IA.FSM.Villager
         {
             Transform transform = stateParameters.Parameters[0] as Transform;
             GameObject Target = stateParameters.Parameters[2] as GameObject;
+            VoronoiController voronoi = stateParameters.Parameters[7] as VoronoiController;
+            List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+
+
             List<Action> behaviours = new List<Action>();
             behaviours.Add(() =>
             {
-                stateParameters.Parameters[3] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
+                if (Target == null && AdminOfGame.GetMap().MinesAvailable.Count > 0)
+                {
+                    voronoi.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                    Target = voronoi.GetMineCloser(transform.position).transform.gameObject;
+                    stateParameters.Parameters[2] = Target;
+                    travelPositions = new List<Vector3>();
+                    travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
+                    stateParameters.Parameters[5] = travelPositions;
+                }
+                if(Target != null)
+                stateParameters.Parameters[5] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
             });
             return behaviours;
         }

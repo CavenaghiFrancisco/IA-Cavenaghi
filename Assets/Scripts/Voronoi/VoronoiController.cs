@@ -14,7 +14,7 @@ public class VoronoiController : MonoBehaviour
         Draw();
     }
 
-    public void Init()
+    public void Awake()
     {
         sectors = new List<Sector>();
 
@@ -68,16 +68,33 @@ public class VoronoiController : MonoBehaviour
         return null;
     }
 
+    public Mine GetWorkedMineCloser(Vector3 minerPos, List<Mine> mines)
+    {
+        if (sectors != null)
+        {
+            for (int i = 0; i < sectors.Count; i++)
+            {
+                if (sectors[i].CheckPointInSector(minerPos))
+                {
+                    return sectors[i].Mine;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private void InitLimits()
     {
         limits = new List<Limit>();
 
 
         limits.Add(new Limit(new Vector2(0,0),DIRECTION.LEFT));
-        limits.Add(new Limit(new Vector2(0f, AdminOfGame.GetMap().SizeY) , DIRECTION.UP));
-        limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX, AdminOfGame.GetMap().SizeY) , DIRECTION.RIGHT));
-        limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX, 0f) , DIRECTION.DOWN));
+        limits.Add(new Limit(new Vector2(0f, AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) , DIRECTION.UP));
+        limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f, AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) , DIRECTION.RIGHT));
+        limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f, 0f) , DIRECTION.DOWN));
     }
+    
 
     private void Draw()
     {

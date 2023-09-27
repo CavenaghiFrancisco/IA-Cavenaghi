@@ -16,6 +16,8 @@ namespace MinerSimulator.Utils.Pathfinder
         static Node[,] grid => AdminOfGame.GetMap().grid;
         static int gridSizeX => AdminOfGame.GetMap().SizeX;
         static int gridSizeY => AdminOfGame.GetMap().SizeY;
+        static float gridSizeBetweenY => AdminOfGame.GetMap().SpaceBetweenY;
+        static float gridSizeBetweenX => AdminOfGame.GetMap().SpaceBetweenX;
 
         private static void ConnectNeighbours()
         {
@@ -25,7 +27,7 @@ namespace MinerSimulator.Utils.Pathfinder
                 for (int y = 0; y < gridSizeY; y++)
                 {
                     Node node = grid[x, y];
-                    if (x > 0) node.neighbours.Add(grid[x - 1, y]);
+                    if (x > 0) node.neighbours.Add(grid[x -1, y]);
                     if (x < gridSizeX - 1) node.neighbours.Add(grid[x + 1, y]);
                     if (y > 0) node.neighbours.Add(grid[x, y - 1]);
                     if (y < gridSizeY - 1) node.neighbours.Add(grid[x, y + 1]);
@@ -35,8 +37,22 @@ namespace MinerSimulator.Utils.Pathfinder
 
         public static List<Vector3> FindPath(Vector3 start, Vector3 target, PawnType type)
         {
-            Node startNode = grid[(int)start.x, (int)start.z];
-            Node targetNode = grid[(int)target.x, (int)target.z];
+            Node startNode = null;
+            Node targetNode = null;
+            for (int x = 0; x < gridSizeX; x++)
+            {
+                for (int y = 0; y < gridSizeY; y++)
+                { 
+                    if(Mathf.Abs(grid[x,y].X - start.x) < gridSizeBetweenX/2f && Mathf.Abs(grid[x, y].Y - start.z) < gridSizeBetweenY / 2f)
+                    {
+                        startNode = grid[x, y];
+                    }
+                    if (Mathf.Abs(grid[x, y].X - target.x) < gridSizeBetweenX / 2f && Mathf.Abs(grid[x, y].Y - target.z) < gridSizeBetweenY / 2f)
+                    {
+                        targetNode = grid[x, y];
+                    }
+                }
+            }
 
             ConnectNeighbours();
 
@@ -62,7 +78,7 @@ namespace MinerSimulator.Utils.Pathfinder
                         continue;
 
                     float auxCost = currentNode.cost + CalculateMoveCost(currentNode, neighbour,type);
-                    if (auxCost < neighbour.cost)
+                    if (auxCost <= neighbour.cost)
                     {
                         neighbour.cost = auxCost;
                         neighbour.hCost = CalculateDistanceCost(neighbour, targetNode);

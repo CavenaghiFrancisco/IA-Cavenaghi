@@ -1,6 +1,5 @@
 using MinerSimulator.Utils.Pathfinder;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
