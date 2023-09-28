@@ -1,4 +1,7 @@
-public class StateParameters
+namespace IA.FSM.States
 {
-    public object[] Parameters { get; set; }
+    public class StateParameters
+    {
+        public object[] Parameters { get; set; }
+    }
 }

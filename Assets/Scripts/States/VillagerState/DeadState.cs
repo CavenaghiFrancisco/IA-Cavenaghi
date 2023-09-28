@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IA.FSM.Villager
+namespace IA.FSM.States.Villager
 {
     public class DeadState : State
     {

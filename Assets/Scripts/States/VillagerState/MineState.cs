@@ -1,8 +1,13 @@
+using IA.FSM.Villager;
+using MinerSimulator.Admins;
+using MinerSimulator.Entity;
 using MinerSimulator.Utils.Pathfinder;
+using MinerSimulator.Utils.Voronoi;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-namespace IA.FSM.Villager
+
+namespace IA.FSM.States.Villager
 {
     public class MineState : State
     {

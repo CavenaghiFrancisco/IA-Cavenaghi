@@ -1,9 +1,13 @@
+using IA.FSM.Carriage;
+using MinerSimulator.Admins;
+using MinerSimulator.Entity;
 using MinerSimulator.Utils.Pathfinder;
+using MinerSimulator.Utils.Voronoi;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IA.FSM.Carriage
+namespace IA.FSM.States.Carriage
 {
     public class SuplyState : State
     {

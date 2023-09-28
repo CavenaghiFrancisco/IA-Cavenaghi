@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MinerSimulator.Utils.MapUtils
+namespace MinerSimulator.Map
 {
     public enum EntityType
     {
