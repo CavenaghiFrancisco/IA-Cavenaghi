@@ -15,7 +15,7 @@ namespace MinerSimulator.Admins
         public GameObject villagerPrefab;
         public GameObject carriagePrefab;
         public int villagerQuantity = 3;
-        public int carriageQuantity = 1;
+        public static int carriageQuantity = 1;
 
         static bool emergency = false;
 
@@ -42,9 +42,11 @@ namespace MinerSimulator.Admins
                 carriageAux.AddComponent<VoronoiController>();
                 carriageAux.GetComponent<Carriage>().Home = gameObject;
                 carriageAux.GetComponent<Carriage>().Speed = UnityEngine.Random.Range(7, 10);
+                carriageQuantity--;
+                i--;
             }
 
-            ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 6 };
+            ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 32 };
 
             Parallel.ForEach(villagers, options, currentItem =>
             {

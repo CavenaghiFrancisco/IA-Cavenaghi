@@ -42,13 +42,14 @@ namespace IA.FSM.States.Villager
                     travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.VILLAGER);
                     stateParameters.Parameters[5] = travelPositions;
                 }
+                if(travelPositions.Count > 0)
                 transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
 
                 if (Vector3.Distance(transform.position, Target.transform.position) < 0.5f)
                 {
                     Transition((int)Flags.OnNearTarget);
                 }
-                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
+                if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                 {
                     travelPositions.RemoveAt(0);
                     stateParameters.Parameters[5] = travelPositions;

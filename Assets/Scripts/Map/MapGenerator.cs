@@ -16,6 +16,7 @@ namespace MinerSimulator.Map
         [SerializeField] private int spaceBetweenX = 1;
         [SerializeField] private int spaceBetweenY = 1;
         [SerializeField] private int minesQuantity = 1;
+        [SerializeField] private int waterQuantity = 10;
         [SerializeField] private int homesQuantity = 1;
         [SerializeField] private Button emergencyButton;
 
@@ -64,6 +65,14 @@ namespace MinerSimulator.Map
                     GameObject aux = Instantiate(tilePrefab, new Vector3(i * spaceBetweenX / 2f, 0, j * spaceBetweenY / 2f), Quaternion.identity);
                     aux.transform.localScale = new Vector3(spaceBetweenX / 2f, 1f, spaceBetweenY / 2f);
                     aux.transform.SetParent(mapGO.transform);
+                    if (!grid[i, j].isWalkable)
+                    {
+                        aux.transform.GetComponent<MeshRenderer>().material.color = Color.blue;
+                    }
+                    else
+                    {
+                        aux.transform.GetComponent<MeshRenderer>().material.color = Color.green;
+                    }
                 }
             }
             CreateGameplayEntities();
@@ -102,6 +111,22 @@ namespace MinerSimulator.Map
                         {
                             grid[i, j].type = EntityType.HOME;
                             unusedTiles.Remove(homePosition);
+                        }
+                    }
+                }
+            }
+
+            for (int k = 0; k < waterQuantity; k++)
+            {
+                Vector3 waterPosition = GetRandomPosition(unusedTiles);
+                for (int i = 0; i < sizeX; i++)
+                {
+                    for (int j = 0; j < sizeY; j++)
+                    {
+                        if (grid[i, j].X == waterPosition.x && grid[i, j].Y == waterPosition.z)
+                        {
+                            grid[i, j].isWalkable = false;
+                            unusedTiles.Remove(waterPosition);
                         }
                     }
                 }

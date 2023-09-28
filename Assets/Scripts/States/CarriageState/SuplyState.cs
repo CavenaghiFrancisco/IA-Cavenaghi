@@ -32,7 +32,7 @@ namespace IA.FSM.States.Carriage
                         stateParameters.Parameters[2] = Target;
                     }
                 }
-                if (VillagerAdmin.Emergency || voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false) == null)
+                if (VillagerAdmin.Emergency || voronoi.workdMines.Count <= 0)
                 {
                     Transition((int)Flags.OnNeedToReturnHome);
                     return;
@@ -56,7 +56,7 @@ namespace IA.FSM.States.Carriage
                     stateParameters.Parameters[3] = 0;
                     Transition((int)Flags.OnNeedToReturnHome);
                 }
-                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
+                if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                 {
                     travelPositions.RemoveAt(0);
                     stateParameters.Parameters[5] = travelPositions;

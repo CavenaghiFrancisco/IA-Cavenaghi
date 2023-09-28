@@ -12,7 +12,7 @@ namespace MinerSimulator.Utils.Voronoi
 
         private List<Limit> limits = null;
         private List<Sector> sectors = null;
-        List<Mine> workdMines = new List<Mine>();
+        public List<Mine> workdMines = new List<Mine>();
 
         private void OnDrawGizmos()
         {

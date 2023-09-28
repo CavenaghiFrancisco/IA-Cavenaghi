@@ -511,11 +511,13 @@ MonoBehaviour:
   tilePrefab: {fileID: 6239723342196210577, guid: d9204089e3604e94189468bc918952a1, type: 3}
   minePrefab: {fileID: 8562492858234512033, guid: 3e57e7895ab17c74abcddcb05cd35254, type: 3}
   homePrefab: {fileID: 2853987638668210283, guid: 79adef3c3bae1d84e838a5575581847f, type: 3}
-  sizeX: 20
-  sizeY: 20
+  sizeX: 40
+  sizeY: 40
   spaceBetweenX: 2
   spaceBetweenY: 2
   minesQuantity: 10
+  waterQuantity: 10
+  homesQuantity: 2
   emergencyButton: {fileID: 473958034}
 --- !u!4 &646404248
 Transform:

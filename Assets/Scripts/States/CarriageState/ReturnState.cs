@@ -42,7 +42,7 @@ namespace IA.FSM.States.Carriage
                 {
                     food = 10;
                     stateParameters.Parameters[3] = food;
-                    if (voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false) == null)
+                    if (voronoi.workdMines.Count <= 0)
                     {
                         if(VillagerAdmin.Emergency)
                             transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;

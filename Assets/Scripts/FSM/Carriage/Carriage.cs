@@ -1,6 +1,7 @@
 using IA.FSM.States;
 using IA.FSM.States.Carriage;
 using MinerSimulator.Admins;
+using MinerSimulator.Entity;
 using MinerSimulator.Utils.Voronoi;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,11 @@ namespace IA.FSM.Carriage
 
         private void Start()
         {
+            Mine.OnMineDestroy += (bool areMines) =>
+            {
+                if (!areMines)
+                    fsm.SetCurrentStateForced((int)States.Return);
+            };
             voronoiCalculator = GetComponent<VoronoiController>();
             allParameters = new StateParameters();
 
