@@ -46,9 +46,9 @@ namespace IA.FSM.Carriage
 
         private void Start()
         {
-            Mine.OnMineDestroy += (bool areMines) =>
+            Mine.OnMineDestroy += (bool areMines,bool areWorkedMines) =>
             {
-                if (!areMines)
+                if (!areWorkedMines)
                     fsm.SetCurrentStateForced((int)States.Return);
             };
             voronoiCalculator = GetComponent<VoronoiController>();

@@ -12,7 +12,8 @@ namespace MinerSimulator.Utils.Voronoi
 
         private List<Limit> limits = null;
         private List<Sector> sectors = null;
-        public List<Mine> workdMines = new List<Mine>();
+        public static List<Mine> workdMines = new List<Mine>();
+        public static List<Mine> Mines = new List<Mine>();
 
         private void OnDrawGizmos()
         {
@@ -26,8 +27,22 @@ namespace MinerSimulator.Utils.Voronoi
             InitLimits();
         }
 
+        private void Update()
+        {
+            workdMines = new List<Mine>();
+
+            foreach (Mine mine in Mines)
+            {
+                if (mine.Worked)
+                {
+                    workdMines.Add(mine);
+                }
+            }
+        }
+
         public void SetVoronoi(List<Mine> mines)
         {
+            Mines = mines;
             sectors.Clear();
             if (mines.Count == 0) return;
 
@@ -75,6 +90,7 @@ namespace MinerSimulator.Utils.Voronoi
 
         public Mine GetWorkedMineCloser(Vector3 carriagePos, List<Mine> mines, bool setVoronoi)
         {
+            Mines = mines;
             if (setVoronoi)
             {
                 workdMines = new List<Mine>();

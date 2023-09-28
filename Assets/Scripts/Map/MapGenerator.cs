@@ -19,6 +19,8 @@ namespace MinerSimulator.Map
         [SerializeField] private int waterQuantity = 10;
         [SerializeField] private int homesQuantity = 1;
         [SerializeField] private Button emergencyButton;
+        [SerializeField] private GameObject planeEmergency;
+
 
         public Node[,] grid;
         public int SizeX { get => sizeX; }
@@ -92,10 +94,15 @@ namespace MinerSimulator.Map
                     else if (grid[i, j].type == EntityType.HOME)
                     {
                         GameObject home = Instantiate(homePrefab, new Vector3(grid[i, j].X, 1, grid[i, j].Y), Quaternion.identity);
-                        emergencyButton.onClick.AddListener(() => VillagerAdmin.SetEmergency());
+                        
                     }
                 }
             }
+            emergencyButton.onClick.AddListener(() =>
+            {
+                VillagerAdmin.SetEmergency(VillagerAdmin.Emergency);
+                planeEmergency.GetComponent<MeshRenderer>().material.color = (VillagerAdmin.Emergency ? Color.red : Color.white);
+            });
         }
 
         private void CreateEntities()

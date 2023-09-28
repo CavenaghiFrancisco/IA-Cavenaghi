@@ -33,7 +33,7 @@ namespace IA.FSM.States.Carriage
                 if (travelPositions.Count > 0)
                 transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
 
-                if(food > 0)
+                if(food > 0 && VoronoiController.workdMines.Count > 0 && !VillagerAdmin.Emergency)
                 {
                     Transition((int)Flags.OnSuplyMode);
                 }
@@ -42,13 +42,14 @@ namespace IA.FSM.States.Carriage
                 {
                     food = 10;
                     stateParameters.Parameters[3] = food;
-                    if (voronoi.workdMines.Count <= 0)
+                    if (VoronoiController.workdMines.Count <= 0 || VillagerAdmin.Emergency)
                     {
                         if(VillagerAdmin.Emergency)
                             transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
                         return;
                     }
                     transform.GetChild(0).GetComponent<MeshRenderer>().enabled = true;
+                    if(VoronoiController.workdMines.Count > 0)
                     Transition((int)Flags.OnSuplyMode);
                 }
                 if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)

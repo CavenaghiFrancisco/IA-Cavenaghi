@@ -1,4 +1,5 @@
 using MinerSimulator.Admins;
+using MinerSimulator.Utils.Voronoi;
 using System;
 using TMPro;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace MinerSimulator.Entity
 
         private bool worked = false;
 
-        public static Action<bool> OnMineDestroy;
+        public static Action<bool,bool> OnMineDestroy;
 
         private bool isEmpty = false;
 
@@ -65,7 +66,7 @@ namespace MinerSimulator.Entity
             isEmpty = true;
             AdminOfGame.GetMap().MinesAvailable.Remove(this);
             Destroy(gameObject);
-            OnMineDestroy?.Invoke(AdminOfGame.GetMap().MinesAvailable.Count > 0);
+            OnMineDestroy?.Invoke(AdminOfGame.GetMap().MinesAvailable.Count > 0,VoronoiController.workdMines.Count > 0);
         }
 
         private void SetAmount(int amount)

@@ -32,7 +32,7 @@ namespace IA.FSM.States.Carriage
                         stateParameters.Parameters[2] = Target;
                     }
                 }
-                if (VillagerAdmin.Emergency || voronoi.workdMines.Count <= 0)
+                if (VillagerAdmin.Emergency || VoronoiController.workdMines.Count <= 0)
                 {
                     Transition((int)Flags.OnNeedToReturnHome);
                     return;

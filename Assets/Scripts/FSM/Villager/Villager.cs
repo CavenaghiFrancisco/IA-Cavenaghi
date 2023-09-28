@@ -51,7 +51,7 @@ namespace IA.FSM.Villager
 
         private void Start()
         {
-            Mine.OnMineDestroy += (bool areMines) =>
+            Mine.OnMineDestroy += (bool areMines, bool areWorkedMines) =>
             {
                 voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
                 if(!areMines)
@@ -96,7 +96,7 @@ namespace IA.FSM.Villager
 
         private void OnDestroy()
         {
-            Mine.OnMineDestroy -= (bool areMines) =>
+            Mine.OnMineDestroy -= (bool areMines, bool areWorkedMines) =>
             {
                 voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
                 fsm.SetCurrentStateForced((int)States.Retrieve);

@@ -59,9 +59,9 @@ namespace MinerSimulator.Admins
             });
         }
 
-        public static void SetEmergency()
+        public static void SetEmergency(bool isEmergency)
         {
-            emergency = !emergency;
+            emergency = !isEmergency;
             OnEmergencyCalled();
         }
     }
