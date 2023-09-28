@@ -30,12 +30,16 @@ namespace MinerSimulator.Map
         public List<Mine> MinesAvailable { get => minesAvailable; }
 
         List<Mine> minesAvailable = new List<Mine>();
-        VillagerAdmin homeAvailable;
 
         List<Vector3> unusedTiles = new List<Vector3>();
 
-        private void Start()
+        public void CreateMap(int sizeX, int sizeY, int spaceBetween, int minesQuantity)
         {
+            this.sizeX = sizeX;
+            this.sizeY = sizeY;
+            this.spaceBetweenX = spaceBetween;
+            this.spaceBetweenY = spaceBetween;
+            this.minesQuantity = minesQuantity;
             CreateStructureMap();
             CreateGameplayRepresentation();
         }
