@@ -31,7 +31,7 @@ namespace MinerSimulator.Admins
                 villagers.Add(villagerAux.GetComponent<Villager>());
                 villagerAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
                 villagerAux.GetComponent<Villager>().Home = this.gameObject;
-                villagerAux.GetComponent<Villager>().Speed = UnityEngine.Random.Range(1,4);
+                villagerAux.GetComponent<Villager>().Speed = UnityEngine.Random.Range(1,2);
             }
 
             for (int i = 0; i < carriageQuantity; i++)
