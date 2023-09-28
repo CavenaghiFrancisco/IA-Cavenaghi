@@ -21,24 +21,28 @@ namespace IA.FSM.Carriage
 {
     public class Carriage : MonoBehaviour
     {
-        public GameObject Target;
-        public GameObject Home;
+        private GameObject target;
+        private GameObject home;
+        private VoronoiController voronoiCalculator;
 
-        private float speed = 7;
+        private float speed;
 
-        public float food = 0;
+        private float food = 0;
 
         private FSM fsm;
 
         private List<Vector3> travelPositions;
 
-        StateParameters returnParameters;
-        StateParameters suplyParameters;
+        StateParameters allParameters;
 
-        private void Awake()
+        public GameObject Target { get => target; set => target = value; }
+        public GameObject Home { get => home; set => home = value; }
+        public float Speed { get => speed; set => speed = value; }
+
+        private void Start()
         {
-            returnParameters = new StateParameters();
-            suplyParameters = new StateParameters();
+            voronoiCalculator = GetComponent<VoronoiController>();
+            allParameters = new StateParameters();
 
             fsm = new FSM(Enum.GetValues(typeof(States)).Length, Enum.GetValues(typeof(Flags)).Length);
 
@@ -46,20 +50,26 @@ namespace IA.FSM.Carriage
 
             fsm.SetRelation((int)States.Suply, (int)Flags.OnNeedToReturnHome, (int)States.Return);
 
-            returnParameters.Parameters = new object[5] { gameObject.transform, speed, Target, travelPositions, food };
+            allParameters.Parameters = new object[7] { gameObject.transform, speed, Target, food, Home, travelPositions, voronoiCalculator };
             fsm.AddState<SuplyState>((int)States.Suply,
-                suplyParameters, suplyParameters);
+                allParameters, allParameters);
 
-            suplyParameters.Parameters = new object[6] { gameObject.transform, speed, Target, food, Home, travelPositions };
             fsm.AddState<ReturnState>((int)States.Return,
-                returnParameters, returnParameters);
+                allParameters, allParameters);
 
             fsm.SetCurrentStateForced((int)States.Suply);
+
+            VillagerAdmin.OnEmergencyCalled += () => fsm.SetCurrentStateForced((int)States.Return);
         }
 
         public void Update()
         {
             fsm.Update();
+        }
+
+        private void OnDestroy()
+        {
+            VillagerAdmin.OnEmergencyCalled -= () => fsm.SetCurrentStateForced((int)States.Return);
         }
     }
 }

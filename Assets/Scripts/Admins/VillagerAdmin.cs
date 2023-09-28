@@ -30,18 +30,20 @@ public class VillagerAdmin : MonoBehaviour
             villagers.Add(villagerAux.GetComponent<Villager>());
             villagerAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
             villagerAux.GetComponent<Villager>().Home = this.gameObject;
-            villagerAux.GetComponent<Villager>().speed = UnityEngine.Random.Range(3,8);
+            villagerAux.GetComponent<Villager>().Speed = UnityEngine.Random.Range(1,4);
         }
 
         for (int i = 0; i < carriageQuantity; i++)
         {
             GameObject carriageAux = Instantiate(carriagePrefab, transform.position, Quaternion.identity);
+            carriageAux.AddComponent<Carriage>();
             carriages.Add(carriageAux.GetComponent<Carriage>());
-            carriageAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
-            carriageAux.GetComponent<Villager>().Home = this.gameObject;
+            carriageAux.AddComponent<VoronoiController>();
+            carriageAux.GetComponent<Carriage>().Home = gameObject;
+            carriageAux.GetComponent<Carriage>().Speed = UnityEngine.Random.Range(7, 10);
         }
 
-        ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 3 };
+        ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 6 };
 
         Parallel.ForEach(villagers, options, currentItem =>
         {

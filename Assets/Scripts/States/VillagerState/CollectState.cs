@@ -45,7 +45,7 @@ namespace IA.FSM.Villager
                 {
                     Transition((int)Flags.OnNearTarget);
                 }
-                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                 {
                     travelPositions.RemoveAt(0);
                     stateParameters.Parameters[5] = travelPositions;

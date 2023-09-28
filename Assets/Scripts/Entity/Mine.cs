@@ -9,16 +9,18 @@ public class Mine : MonoBehaviour
     [SerializeField] private int amountFood = 20;
     [SerializeField] private TMP_Text amountText = null;
 
-    private bool worked = true;
+    private bool worked = false;
 
     public static Action<bool> OnMineDestroy;
 
     private bool isEmpty = false;
 
     public bool IsEmpty { get => isEmpty; }
+    public bool Worked { get => worked; }
 
     public int Take(int substract)
     {
+        worked = true;
         if (!isEmpty)
         {
             int money = amount - substract;

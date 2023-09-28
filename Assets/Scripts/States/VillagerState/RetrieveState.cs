@@ -37,7 +37,7 @@ namespace IA.FSM.Villager
                             transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
                     }
 
-                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                     {
                         travelPositions.RemoveAt(0);
                         stateParameters.Parameters[5] = travelPositions;
@@ -56,7 +56,7 @@ namespace IA.FSM.Villager
                         stateParameters.Parameters[3] = resources;
                         Transition((int)Flags.OnSeeTarget);
                     }
-                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                    if (travelPositions.Count > 0 && Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                     {
                         travelPositions.RemoveAt(0);
                         stateParameters.Parameters[5] = travelPositions;

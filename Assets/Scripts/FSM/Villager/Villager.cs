@@ -25,20 +25,24 @@ namespace IA.FSM.Villager
 {
     public class Villager : MonoBehaviour
     {
-        public GameObject Target;
-        public GameObject Home;
-        public VoronoiController voronoiCalculator;
-        public int mined = 0;
+        private GameObject target;
+        private GameObject home;
+        private VoronoiController voronoiCalculator;
+        private int mined = 0;
 
-        public float speed = 5;
+        private float speed = 5;
 
-        public float resourcesCollected = 0;
+        private float resourcesCollected = 0;
 
         private FSM fsm;
 
         private List<Vector3> travelPositions;
 
         StateParameters allParameters;
+
+        public GameObject Home { get => home; set => home = value; }
+        public GameObject Target { get => target; set => target = value; }
+        public float Speed { get => speed; set => speed = value; }
 
         private void Start()
         {

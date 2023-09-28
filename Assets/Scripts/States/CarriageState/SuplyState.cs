@@ -12,30 +12,50 @@ namespace IA.FSM.Carriage
             Transform transform = stateParameters.Parameters[0] as Transform;
             float speed = Convert.ToSingle(stateParameters.Parameters[1]);
             GameObject Target = stateParameters.Parameters[2] as GameObject;
-            List<Vector3> travelPositions = stateParameters.Parameters[3] as List<Vector3>;
-            int food = Convert.ToInt32(stateParameters.Parameters[4]);
+            int food = Convert.ToInt32(stateParameters.Parameters[3]);
+            List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+            VoronoiController voronoi = stateParameters.Parameters[6] as VoronoiController;
 
             List<Action> behabiours = new List<Action>();
 
             behabiours.Add(() =>
             {
-                if (travelPositions == null)
+                if (Target == null)
                 {
-                    stateParameters.Parameters[3] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.CARRIAGE);
-                    travelPositions = stateParameters.Parameters[3] as List<Vector3>;
+                    if (voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,true) != null)
+                    {
+                        Target = voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false).transform.gameObject;
+                        stateParameters.Parameters[2] = Target;
+                    }
                 }
-                transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
+                if (VillagerAdmin.Emergency || voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false) == null)
+                {
+                    Transition((int)Flags.OnNeedToReturnHome);
+                    return;
+                }
+                if(Target == null)
+                {
+                    return;
+                }
+                if (travelPositions == null || travelPositions.Count <= 0)
+                {
+                    stateParameters.Parameters[5] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.CARRIAGE);
+                    travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+                }
+
+                if (travelPositions.Count > 0)
+                    transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
 
                 if (Vector3.Distance(transform.position, Target.transform.position) < 1.1f)
                 {
                     Target.GetComponent<Mine>().SuplyFood(food);
-                    stateParameters.Parameters[4] = 0;
+                    stateParameters.Parameters[3] = 0;
                     Transition((int)Flags.OnNeedToReturnHome);
                 }
-                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.1f)
+                if (Vector3.Distance(transform.position, travelPositions[0]) < 0.3f)
                 {
                     travelPositions.RemoveAt(0);
-                    stateParameters.Parameters[3] = travelPositions;
+                    stateParameters.Parameters[5] = travelPositions;
                 }
 
             });
@@ -49,10 +69,25 @@ namespace IA.FSM.Carriage
         {
             Transform transform = stateParameters.Parameters[0] as Transform;
             GameObject Target = stateParameters.Parameters[2] as GameObject;
+            List<Vector3> travelPositions = stateParameters.Parameters[5] as List<Vector3>;
+            VoronoiController voronoi = stateParameters.Parameters[6] as VoronoiController;
             List<Action> behaviours = new List<Action>();
+
             behaviours.Add(() =>
             {
-                stateParameters.Parameters[3] = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.CARRIAGE);
+                if (Target == null)
+                {
+                    if (voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,true) != null)
+                    {
+                        Target = voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false).transform.gameObject;
+                    }
+                }
+                if (Target == null)
+                {
+                    return;
+                }
+                travelPositions = PathFinder.FindPath(transform.position, Target.transform.position, PawnType.CARRIAGE);
+                stateParameters.Parameters[5] = travelPositions;
             });
             return behaviours;
         }

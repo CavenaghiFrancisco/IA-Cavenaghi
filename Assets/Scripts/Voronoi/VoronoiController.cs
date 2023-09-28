@@ -8,6 +8,7 @@ public class VoronoiController : MonoBehaviour
 
     private List<Limit> limits = null;
     private List<Sector> sectors = null;
+    List<Mine> workdMines = new List<Mine>();
 
     private void OnDrawGizmos()
     {
@@ -68,13 +69,28 @@ public class VoronoiController : MonoBehaviour
         return null;
     }
 
-    public Mine GetWorkedMineCloser(Vector3 minerPos, List<Mine> mines)
+    public Mine GetWorkedMineCloser(Vector3 carriagePos, List<Mine> mines, bool setVoronoi)
     {
+        if (setVoronoi)
+        {
+            workdMines = new List<Mine>();
+
+            foreach (Mine mine in mines)
+            {
+                if (mine.Worked)
+                {
+                    workdMines.Add(mine);
+                }
+            }
+
+            SetVoronoi(workdMines);
+        }
+
         if (sectors != null)
         {
             for (int i = 0; i < sectors.Count; i++)
             {
-                if (sectors[i].CheckPointInSector(minerPos))
+                if (sectors[i].CheckPointInSector(carriagePos))
                 {
                     return sectors[i].Mine;
                 }

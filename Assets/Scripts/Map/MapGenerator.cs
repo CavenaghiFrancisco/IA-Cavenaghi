@@ -13,6 +13,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private int spaceBetweenX = 1;
     [SerializeField] private int spaceBetweenY = 1;
     [SerializeField] private int minesQuantity = 1;
+    [SerializeField] private int homesQuantity = 1;
     [SerializeField] private Button emergencyButton;
 
     public Node[,] grid;
@@ -87,15 +88,18 @@ public class MapGenerator : MonoBehaviour
 
     private void CreateEntities()
     {
-        Vector3 homePosition = GetRandomPosition(unusedTiles);
-        for (int i = 0; i < sizeX; i++)
+        for (int k = 0; k < homesQuantity; k++)
         {
-            for (int j = 0; j < sizeY; j++)
+            Vector3 homePosition = GetRandomPosition(unusedTiles);
+            for (int i = 0; i < sizeX; i++)
             {
-                if (grid[i, j].X == homePosition.x && grid[i, j].Y == homePosition.z)
+                for (int j = 0; j < sizeY; j++)
                 {
-                    grid[i, j].type = EntityType.HOME;
-                    unusedTiles.Remove(homePosition);
+                    if (grid[i, j].X == homePosition.x && grid[i, j].Y == homePosition.z)
+                    {
+                        grid[i, j].type = EntityType.HOME;
+                        unusedTiles.Remove(homePosition);
+                    }
                 }
             }
         }
