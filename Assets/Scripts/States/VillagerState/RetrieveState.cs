@@ -1,5 +1,6 @@
-using IA.FSM.Villager;
+using IA.FSM.Entities.Villager;
 using MinerSimulator.Admins;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Pathfinder;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace IA.FSM.States.Villager
 
             behabiours.Add(() =>
             {
-                if (VillagerAdmin.Emergency)
+                if (VillagerAdmin.Instance.Emergency)
                 {
                     if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
                     {
@@ -52,7 +53,7 @@ namespace IA.FSM.States.Villager
 
                     if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
                     {
-                        if (AdminOfGame.GetMap().MinesAvailable.Count <= 0)
+                        if (MapGenerator.Instance.MinesAvailable.Count <= 0)
                             return;
                         resources = 0;
                         stateParameters.Parameters[3] = resources;

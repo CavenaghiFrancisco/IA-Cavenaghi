@@ -1,5 +1,6 @@
-using IA.FSM.Villager;
+using IA.FSM.Entities.Villager;
 using MinerSimulator.Admins;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Pathfinder;
 using MinerSimulator.Utils.Voronoi;
 using System;
@@ -22,7 +23,7 @@ namespace IA.FSM.States.Villager
 
             behabiours.Add(() =>
             {
-                if (AdminOfGame.GetMap().MinesAvailable.Count <= 0 || VillagerAdmin.Emergency)
+                if (MapGenerator.Instance.MinesAvailable.Count <= 0 || VillagerAdmin.Instance.Emergency)
                 {
                     Transition((int)Flags.OnEmergency);
                     return;
@@ -30,7 +31,7 @@ namespace IA.FSM.States.Villager
 
                 if (Target == null)
                 {
-                    voronoi.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                    voronoi.SetVoronoi(MapGenerator.Instance.MinesAvailable);
                     Target = voronoi.GetMineCloser(transform.position).transform.gameObject;
                     stateParameters.Parameters[2] = Target;
                     travelPositions = new List<Vector3>();
@@ -73,9 +74,9 @@ namespace IA.FSM.States.Villager
             List<Action> behaviours = new List<Action>();
             behaviours.Add(() =>
             {
-                if (Target == null && AdminOfGame.GetMap().MinesAvailable.Count > 0)
+                if (Target == null && MapGenerator.Instance.MinesAvailable.Count > 0)
                 {
-                    voronoi.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                    voronoi.SetVoronoi(MapGenerator.Instance.MinesAvailable);
                     Target = voronoi.GetMineCloser(transform.position).transform.gameObject;
                     stateParameters.Parameters[2] = Target;
                     travelPositions = new List<Vector3>();

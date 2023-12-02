@@ -1,4 +1,5 @@
 using MinerSimulator.Admins;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Voronoi;
 using System;
 using TMPro;
@@ -64,9 +65,9 @@ namespace MinerSimulator.Entity
         private void SetEmpty()
         {
             isEmpty = true;
-            AdminOfGame.GetMap().MinesAvailable.Remove(this);
+            MapGenerator.Instance.MinesAvailable.Remove(this);
             Destroy(gameObject);
-            OnMineDestroy?.Invoke(AdminOfGame.GetMap().MinesAvailable.Count > 0,VoronoiController.workdMines.Count > 0);
+            OnMineDestroy?.Invoke(MapGenerator.Instance.MinesAvailable.Count > 0,VoronoiController.workdMines.Count > 0);
         }
 
         private void SetAmount(int amount)

@@ -2,12 +2,12 @@ using IA.FSM.States;
 using IA.FSM.States.Villager;
 using MinerSimulator.Admins;
 using MinerSimulator.Entity;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Voronoi;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace IA.FSM.Villager
+namespace IA.FSM.Entities.Villager
 {
     internal enum States
     {
@@ -26,34 +26,19 @@ namespace IA.FSM.Villager
     }
 }
 
-namespace IA.FSM.Villager
+namespace IA.FSM.Entities.Villager
 {
-    public class Villager : MonoBehaviour
+    public class Villager : Entity
     {
-        private GameObject target;
-        private GameObject home;
-        private VoronoiController voronoiCalculator;
         private int mined = 0;
-
-        private float speed = 5;
 
         private float resourcesCollected = 0;
 
-        private FSM fsm;
-
-        private List<Vector3> travelPositions;
-
-        StateParameters allParameters;
-
-        public GameObject Home { get => home; set => home = value; }
-        public GameObject Target { get => target; set => target = value; }
-        public float Speed { get => speed; set => speed = value; }
-
-        private void Start()
+        protected override void Start()
         {
             Mine.OnMineDestroy += (bool areMines, bool areWorkedMines) =>
             {
-                voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                voronoiCalculator.SetVoronoi(MapGenerator.Instance.MinesAvailable);
                 if(!areMines)
                     fsm.SetCurrentStateForced((int)States.Retrieve);
             };
@@ -88,9 +73,9 @@ namespace IA.FSM.Villager
             fsm.SetCurrentStateForced((int)States.Collect);
         }
 
-        public void Update()
+        public new void Update()
         {
-            if(!(Vector3.Distance(transform.position,Home.transform.position) < 1 && AdminOfGame.GetMap().MinesAvailable.Count < 0))
+            if(!(Vector3.Distance(transform.position,Home.transform.position) < 1 && MapGenerator.Instance.MinesAvailable.Count < 0))
             fsm.Update();
         }
 
@@ -98,7 +83,7 @@ namespace IA.FSM.Villager
         {
             Mine.OnMineDestroy -= (bool areMines, bool areWorkedMines) =>
             {
-                voronoiCalculator.SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                voronoiCalculator.SetVoronoi(MapGenerator.Instance.MinesAvailable);
                 fsm.SetCurrentStateForced((int)States.Retrieve);
             };
 

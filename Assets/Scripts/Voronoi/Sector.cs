@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using MinerSimulator.Entity;
 using MinerSimulator.Admins;
+using MinerSimulator.Map;
 
 namespace MinerSimulator.Utils.Voronoi
 {
@@ -197,9 +198,9 @@ namespace MinerSimulator.Utils.Voronoi
             Vector2 intersection = Vector2.zero;
 
             Vector2 p1 = seg1.Mediatrix;
-            Vector2 p2 = seg1.Mediatrix + seg1.Direction * Mathf.Sqrt((AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) * (AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) + (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) * (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f));
+            Vector2 p2 = seg1.Mediatrix + seg1.Direction * Mathf.Sqrt((MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f) * (MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f) + (MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f) * (MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f));
             Vector2 p3 = seg2.Mediatrix;
-            Vector2 p4 = seg2.Mediatrix + seg2.Direction * Mathf.Sqrt((AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) * (AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f) + (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f) * (AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f));
+            Vector2 p4 = seg2.Mediatrix + seg2.Direction * Mathf.Sqrt((MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f) * (MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f) + (MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f) * (MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f));
 
             if (((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)) == 0) return intersection;
 

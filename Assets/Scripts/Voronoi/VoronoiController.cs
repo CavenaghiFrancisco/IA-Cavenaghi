@@ -1,5 +1,6 @@
 using MinerSimulator.Admins;
 using MinerSimulator.Entity;
+using MinerSimulator.Map;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -126,9 +127,9 @@ namespace MinerSimulator.Utils.Voronoi
 
 
             limits.Add(new Limit(new Vector2(0, 0), DIRECTION.LEFT));
-            limits.Add(new Limit(new Vector2(0f, AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f), DIRECTION.UP));
-            limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f, AdminOfGame.GetMap().SizeY * AdminOfGame.GetMap().SpaceBetweenY / 2f), DIRECTION.RIGHT));
-            limits.Add(new Limit(new Vector2(AdminOfGame.GetMap().SizeX * AdminOfGame.GetMap().SpaceBetweenX / 2f, 0f), DIRECTION.DOWN));
+            limits.Add(new Limit(new Vector2(0f, MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f), DIRECTION.UP));
+            limits.Add(new Limit(new Vector2(MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f, MapGenerator.Instance.SizeY * MapGenerator.Instance.SpaceBetweenY / 2f), DIRECTION.RIGHT));
+            limits.Add(new Limit(new Vector2(MapGenerator.Instance.SizeX * MapGenerator.Instance.SpaceBetweenX / 2f, 0f), DIRECTION.DOWN));
         }
 
 

@@ -1,4 +1,4 @@
-using IA.FSM.Carriage;
+using IA.FSM.Entities.Carriage;
 using MinerSimulator.Admins;
 using MinerSimulator.Utils.Pathfinder;
 using MinerSimulator.Utils.Voronoi;
@@ -33,7 +33,7 @@ namespace IA.FSM.States.Carriage
                 if (travelPositions.Count > 0)
                 transform.position += Vector3.Normalize(travelPositions[0] - transform.position) * Time.deltaTime * speed;
 
-                if(food > 0 && VoronoiController.workdMines.Count > 0 && !VillagerAdmin.Emergency)
+                if(food > 0 && VoronoiController.workdMines.Count > 0 && !VillagerAdmin.Instance.Emergency)
                 {
                     Transition((int)Flags.OnSuplyMode);
                 }
@@ -42,9 +42,9 @@ namespace IA.FSM.States.Carriage
                 {
                     food = 10;
                     stateParameters.Parameters[3] = food;
-                    if (VoronoiController.workdMines.Count <= 0 || VillagerAdmin.Emergency)
+                    if (VoronoiController.workdMines.Count <= 0 || VillagerAdmin.Instance.Emergency)
                     {
-                        if(VillagerAdmin.Emergency)
+                        if(VillagerAdmin.Instance.Emergency)
                             transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
                         return;
                     }

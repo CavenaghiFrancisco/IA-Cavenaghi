@@ -1,5 +1,6 @@
-using IA.FSM.Carriage;
-using IA.FSM.Villager;
+using IA.FSM.Entities.Carriage;
+using IA.FSM.Entities.Villager;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Voronoi;
 using System;
 using System.Threading.Tasks;
@@ -17,11 +18,24 @@ namespace MinerSimulator.Admins
         public int villagerQuantity = 3;
         public static int carriageQuantity = 1;
 
-        static bool emergency = false;
+        bool emergency = false;
 
-        public static bool Emergency { get => emergency; }
+        public bool Emergency { get => emergency; }
 
         public static Action OnEmergencyCalled;
+
+        private static VillagerAdmin instance;
+
+        public static VillagerAdmin Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = FindObjectOfType<VillagerAdmin>();
+
+                return instance;
+            }
+        }
 
         private void Start()
         {
@@ -29,7 +43,7 @@ namespace MinerSimulator.Admins
             {
                 GameObject villagerAux = Instantiate(villagerPrefab, transform.position, Quaternion.identity);
                 villagers.Add(villagerAux.GetComponent<Villager>());
-                villagerAux.AddComponent<VoronoiController>().SetVoronoi(AdminOfGame.GetMap().MinesAvailable);
+                villagerAux.AddComponent<VoronoiController>().SetVoronoi(MapGenerator.Instance.MinesAvailable);
                 villagerAux.GetComponent<Villager>().Home = this.gameObject;
                 villagerAux.GetComponent<Villager>().Speed = UnityEngine.Random.Range(1,2);
             }
@@ -59,7 +73,7 @@ namespace MinerSimulator.Admins
             });
         }
 
-        public static void SetEmergency(bool isEmergency)
+        public void SetEmergency(bool isEmergency)
         {
             emergency = !isEmergency;
             OnEmergencyCalled();

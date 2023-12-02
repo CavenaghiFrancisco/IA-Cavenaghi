@@ -4,10 +4,8 @@ using MinerSimulator.Admins;
 using MinerSimulator.Entity;
 using MinerSimulator.Utils.Voronoi;
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace IA.FSM.Carriage
+namespace IA.FSM.Entities.Carriage
 {
     internal enum States
     {
@@ -22,31 +20,15 @@ namespace IA.FSM.Carriage
     }
 }
 
-namespace IA.FSM.Carriage
+namespace IA.FSM.Entities.Carriage
 {
-    public class Carriage : MonoBehaviour
+    public class Carriage : Entity
     {
-        private GameObject target;
-        private GameObject home;
-        private VoronoiController voronoiCalculator;
-
-        private float speed;
-
         private float food = 0;
 
-        private FSM fsm;
-
-        private List<Vector3> travelPositions;
-
-        StateParameters allParameters;
-
-        public GameObject Target { get => target; set => target = value; }
-        public GameObject Home { get => home; set => home = value; }
-        public float Speed { get => speed; set => speed = value; }
-
-        private void Start()
+        protected override void Start()
         {
-            Mine.OnMineDestroy += (bool areMines,bool areWorkedMines) =>
+            Mine.OnMineDestroy += (bool areMines, bool areWorkedMines) =>
             {
                 if (!areWorkedMines)
                     fsm.SetCurrentStateForced((int)States.Return);
@@ -70,11 +52,6 @@ namespace IA.FSM.Carriage
             fsm.SetCurrentStateForced((int)States.Suply);
 
             VillagerAdmin.OnEmergencyCalled += () => fsm.SetCurrentStateForced((int)States.Return);
-        }
-
-        public void Update()
-        {
-            fsm.Update();
         }
 
         private void OnDestroy()

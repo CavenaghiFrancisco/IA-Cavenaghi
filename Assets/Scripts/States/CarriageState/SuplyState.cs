@@ -1,6 +1,7 @@
-using IA.FSM.Carriage;
+using IA.FSM.Entities.Carriage;
 using MinerSimulator.Admins;
 using MinerSimulator.Entity;
+using MinerSimulator.Map;
 using MinerSimulator.Utils.Pathfinder;
 using MinerSimulator.Utils.Voronoi;
 using System;
@@ -26,13 +27,13 @@ namespace IA.FSM.States.Carriage
             {
                 if (Target == null)
                 {
-                    if (voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,true) != null)
+                    if (voronoi.GetWorkedMineCloser(transform.position, MapGenerator.Instance.MinesAvailable,true) != null)
                     {
-                        Target = voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false).transform.gameObject;
+                        Target = voronoi.GetWorkedMineCloser(transform.position, MapGenerator.Instance.MinesAvailable,false).transform.gameObject;
                         stateParameters.Parameters[2] = Target;
                     }
                 }
-                if (VillagerAdmin.Emergency || VoronoiController.workdMines.Count <= 0)
+                if (VillagerAdmin.Instance.Emergency || VoronoiController.workdMines.Count <= 0)
                 {
                     Transition((int)Flags.OnNeedToReturnHome);
                     return;
@@ -81,9 +82,9 @@ namespace IA.FSM.States.Carriage
             {
                 if (Target == null)
                 {
-                    if (voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,true) != null)
+                    if (voronoi.GetWorkedMineCloser(transform.position, MapGenerator.Instance.MinesAvailable,true) != null)
                     {
-                        Target = voronoi.GetWorkedMineCloser(transform.position, AdminOfGame.GetMap().MinesAvailable,false).transform.gameObject;
+                        Target = voronoi.GetWorkedMineCloser(transform.position, MapGenerator.Instance.MinesAvailable,false).transform.gameObject;
                     }
                 }
                 if (Target == null)

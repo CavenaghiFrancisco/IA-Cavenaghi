@@ -14,15 +14,14 @@ namespace MinerSimulator.Utils.Pathfinder
 
     public static class PathFinder
     {
-        static Node[,] grid => AdminOfGame.GetMap().grid;
-        static int gridSizeX => AdminOfGame.GetMap().SizeX;
-        static int gridSizeY => AdminOfGame.GetMap().SizeY;
-        static float gridSizeBetweenY => AdminOfGame.GetMap().SpaceBetweenY;
-        static float gridSizeBetweenX => AdminOfGame.GetMap().SpaceBetweenX;
+        static Node[,] grid => MapGenerator.Instance.grid;
+        static int gridSizeX => MapGenerator.Instance.SizeX;
+        static int gridSizeY => MapGenerator.Instance.SizeY;
+        static float gridSizeBetweenY => MapGenerator.Instance.SpaceBetweenY;
+        static float gridSizeBetweenX => MapGenerator.Instance.SpaceBetweenX;
 
         private static void ConnectNeighbours()
         {
-
             for (int x = 0; x < gridSizeX; x++)
             {
                 for (int y = 0; y < gridSizeY; y++)

@@ -33,6 +33,19 @@ namespace MinerSimulator.Map
 
         List<Vector3> unusedTiles = new List<Vector3>();
 
+        static MapGenerator instance = null;
+
+        public static MapGenerator Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = FindObjectOfType<MapGenerator>();
+
+                return instance;
+            }
+        }
+
         public void CreateMap(int sizeX, int sizeY, int spaceBetween, int minesQuantity)
         {
             this.sizeX = sizeX;
@@ -104,8 +117,8 @@ namespace MinerSimulator.Map
             }
             emergencyButton.onClick.AddListener(() =>
             {
-                VillagerAdmin.SetEmergency(VillagerAdmin.Emergency);
-                planeEmergency.GetComponent<MeshRenderer>().material.color = (VillagerAdmin.Emergency ? Color.red : Color.white);
+                VillagerAdmin.Instance.SetEmergency(VillagerAdmin.Instance.Emergency);
+                planeEmergency.GetComponent<MeshRenderer>().material.color = (VillagerAdmin.Instance.Emergency ? Color.red : Color.white);
             });
         }
 
