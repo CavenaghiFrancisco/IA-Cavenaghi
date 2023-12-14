@@ -108,7 +108,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72ccc1135591f2643a643b040e391bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  villagerPrefab: {fileID: 6287308804681495621, guid: 5f06346a937bfd4439319bcb69be766d, type: 3}
-  carriagePrefab: {fileID: 1932513287070787942, guid: e9f315ce502718f4ba21661a54b54535, type: 3}
-  villagerQuantity: 1
-  carriageQuantity: 1
+  VillagerPrefab: {fileID: 6287308804681495621, guid: 5f06346a937bfd4439319bcb69be766d, type: 3}
+  CarriagePrefab: {fileID: 1932513287070787942, guid: e9f315ce502718f4ba21661a54b54535, type: 3}
+  VillagerQuantity: 2

@@ -1,5 +1,6 @@
 using MinerSimulator.Admins;
 using MinerSimulator.Entity;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,10 +18,13 @@ namespace MinerSimulator.Map
         [SerializeField] private int spaceBetweenY = 1;
         [SerializeField] private int minesQuantity = 1;
         [SerializeField] private int waterQuantity = 10;
+        [SerializeField] private int spikeQuantity = 2;
+        [SerializeField] private int muddyQuantity = 2;
         [SerializeField] private int homesQuantity = 1;
         [SerializeField] private Button emergencyButton;
         [SerializeField] private GameObject planeEmergency;
 
+        private const int GROUND_LEVEL = 1;
 
         public Node[,] grid;
         public int SizeX { get => sizeX; }
@@ -46,6 +50,20 @@ namespace MinerSimulator.Map
             }
         }
 
+        private void Start()
+        {
+            emergencyButton.onClick.AddListener(() =>
+            {
+                VillagerAdmin.Instance.SetEmergency(VillagerAdmin.Instance.Emergency);
+                planeEmergency.GetComponent<MeshRenderer>().material.color = (VillagerAdmin.Instance.Emergency ? Color.red : Color.white);
+            });
+        }
+
+        private void OnDestroy()
+        {
+            emergencyButton.onClick.RemoveAllListeners();
+        }
+
         public void CreateMap(int sizeX, int sizeY, int spaceBetween, int minesQuantity)
         {
             this.sizeX = sizeX;
@@ -53,11 +71,11 @@ namespace MinerSimulator.Map
             this.spaceBetweenX = spaceBetween;
             this.spaceBetweenY = spaceBetween;
             this.minesQuantity = minesQuantity;
-            CreateStructureMap();
-            CreateGameplayRepresentation();
+            CreateMapData();
+            CreateGameplayMapRepresentation();
         }
 
-        private void CreateStructureMap()
+        private void CreateMapData()
         {
             grid = new Node[sizeX, sizeY];
 
@@ -74,7 +92,7 @@ namespace MinerSimulator.Map
             CreateEntities();
         }
 
-        private void CreateGameplayRepresentation()
+        private void CreateGameplayMapRepresentation()
         {
             GameObject mapGO = new GameObject("Map");
             for (int i = 0; i < sizeX; i++)
@@ -82,11 +100,19 @@ namespace MinerSimulator.Map
                 for (int j = 0; j < sizeY; j++)
                 {
                     GameObject aux = Instantiate(tilePrefab, new Vector3(i * spaceBetweenX / 2f, 0, j * spaceBetweenY / 2f), Quaternion.identity);
-                    aux.transform.localScale = new Vector3(spaceBetweenX / 2f, 1f, spaceBetweenY / 2f);
+                    aux.transform.localScale = new Vector3(spaceBetweenX / 2f, GROUND_LEVEL, spaceBetweenY / 2f);
                     aux.transform.SetParent(mapGO.transform);
                     if (!grid[i, j].isWalkable)
                     {
                         aux.transform.GetComponent<MeshRenderer>().material.color = Color.blue;
+                    }
+                    else if(grid[i,j].tileType == TileType.SPIKY)
+                    {
+                        aux.transform.GetComponent<MeshRenderer>().material.color = Color.red;
+                    }
+                    else if (grid[i, j].tileType == TileType.MUDDY)
+                    {
+                        aux.transform.GetComponent<MeshRenderer>().material.color = Color.black;
                     }
                     else
                     {
@@ -105,69 +131,100 @@ namespace MinerSimulator.Map
                 {
                     if (grid[i, j].type == EntityType.MINE)
                     {
-                        GameObject mine = Instantiate(minePrefab, new Vector3(grid[i, j].X, 1, grid[i, j].Y), Quaternion.identity);
+                        GameObject mine = Instantiate(minePrefab, new Vector3(grid[i, j].X, GROUND_LEVEL, grid[i, j].Y), Quaternion.identity);
                         minesAvailable.Add(mine.AddComponent<Mine>());
                     }
                     else if (grid[i, j].type == EntityType.HOME)
                     {
-                        GameObject home = Instantiate(homePrefab, new Vector3(grid[i, j].X, 1, grid[i, j].Y), Quaternion.identity);
+                        GameObject home = Instantiate(homePrefab, new Vector3(grid[i, j].X, GROUND_LEVEL, grid[i, j].Y), Quaternion.identity);
                         
                     }
                 }
             }
-            emergencyButton.onClick.AddListener(() =>
-            {
-                VillagerAdmin.Instance.SetEmergency(VillagerAdmin.Instance.Emergency);
-                planeEmergency.GetComponent<MeshRenderer>().material.color = (VillagerAdmin.Instance.Emergency ? Color.red : Color.white);
-            });
         }
 
         private void CreateEntities()
         {
-            for (int k = 0; k < homesQuantity; k++)
+            CreateEntityAtRandomPosition(EntityType.HOME, homesQuantity, SetHomeEntity);
+            CreateEntityAtRandomPosition(EntityType.MINE, minesQuantity, SetMineEntity);
+            CreateTileAtRandomPosition(TileType.WATER, waterQuantity, SetWaterTile);
+            CreateTileAtRandomPosition(TileType.SPIKY, spikeQuantity, SetSpikyTile);
+            CreateTileAtRandomPosition(TileType.MUDDY, muddyQuantity, SetMuddyTile);
+        }
+
+        private void CreateTileAtRandomPosition(TileType entityType, int quantity, Action<Vector3> setEntityAction)
+        {
+            for (int k = 0; k < quantity; k++)
             {
-                Vector3 homePosition = GetRandomPosition(unusedTiles);
-                for (int i = 0; i < sizeX; i++)
+                Vector3 entityPosition = GetRandomPosition(unusedTiles);
+                setEntityAction(entityPosition);
+            }
+        }
+
+        private void CreateEntityAtRandomPosition(EntityType entityType, int quantity, Action<Vector3> setEntityAction)
+        {
+            for (int k = 0; k < quantity; k++)
+            {
+                Vector3 entityPosition = GetRandomPosition(unusedTiles);
+                setEntityAction(entityPosition);
+            }
+        }
+
+        private void SetHomeEntity(Vector3 position)
+        {
+            SetEntityAtPosition(position, EntityType.HOME);
+            unusedTiles.Remove(position);
+        }
+
+        private void SetWaterTile(Vector3 position)
+        {
+            SetTileAtPosition(position, TileType.WATER,false,0);
+            unusedTiles.Remove(position);
+        }
+
+        private void SetMuddyTile(Vector3 position)
+        {
+            SetTileAtPosition(position, TileType.MUDDY, true, 80);
+            unusedTiles.Remove(position);
+        }
+
+        private void SetSpikyTile(Vector3 position)
+        {
+            SetTileAtPosition(position, TileType.SPIKY,true,80);
+            unusedTiles.Remove(position);
+        }
+
+        private void SetMineEntity(Vector3 position)
+        {
+            SetEntityAtPosition(position, EntityType.MINE);
+            unusedTiles.Remove(position);
+        }
+
+        private void SetEntityAtPosition(Vector3 position, EntityType entityType)
+        {
+            for (int i = 0; i < sizeX; i++)
+            {
+                for (int j = 0; j < sizeY; j++)
                 {
-                    for (int j = 0; j < sizeY; j++)
+                    if (grid[i, j].X == position.x && grid[i, j].Y == position.z)
                     {
-                        if (grid[i, j].X == homePosition.x && grid[i, j].Y == homePosition.z)
-                        {
-                            grid[i, j].type = EntityType.HOME;
-                            unusedTiles.Remove(homePosition);
-                        }
+                        grid[i, j].type = entityType;
                     }
                 }
             }
+        }
 
-            for (int k = 0; k < waterQuantity; k++)
+        private void SetTileAtPosition(Vector3 position, TileType tileType, bool isWalkable = true, float penaltyCost = 0)
+        {
+            for (int i = 0; i < sizeX; i++)
             {
-                Vector3 waterPosition = GetRandomPosition(unusedTiles);
-                for (int i = 0; i < sizeX; i++)
+                for (int j = 0; j < sizeY; j++)
                 {
-                    for (int j = 0; j < sizeY; j++)
+                    if (grid[i, j].X == position.x && grid[i, j].Y == position.z)
                     {
-                        if (grid[i, j].X == waterPosition.x && grid[i, j].Y == waterPosition.z)
-                        {
-                            grid[i, j].isWalkable = false;
-                            unusedTiles.Remove(waterPosition);
-                        }
-                    }
-                }
-            }
-
-            for (int k = 0; k < minesQuantity; k++)
-            {
-                Vector3 minePosition = GetRandomPosition(unusedTiles);
-                for (int i = 0; i < sizeX; i++)
-                {
-                    for (int j = 0; j < sizeY; j++)
-                    {
-                        if (grid[i, j].X == minePosition.x && grid[i, j].Y == minePosition.z)
-                        {
-                            grid[i, j].type = EntityType.MINE;
-                            unusedTiles.Remove(minePosition);
-                        }
+                        grid[i, j].tileType = tileType;
+                        grid[i, j].isWalkable = isWalkable;
+                        grid[i, j].penaltyCost = penaltyCost;
                     }
                 }
             }
@@ -175,7 +232,7 @@ namespace MinerSimulator.Map
 
         Vector3 GetRandomPosition(List<Vector3> positions)
         {
-            int randomIndex = Random.Range(0, positions.Count);
+            int randomIndex = UnityEngine.Random.Range(0, positions.Count);
             Vector3 position = positions[randomIndex];
             return position;
         }

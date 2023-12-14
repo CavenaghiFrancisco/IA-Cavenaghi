@@ -16,47 +16,52 @@ namespace IA.FSM.Entities.Carriage
     internal enum Flags
     {
         OnNeedToReturnHome,
-        OnSuplyMode
+        OnSupplyMode
     }
-}
 
-namespace IA.FSM.Entities.Carriage
-{
     public class Carriage : Entity
     {
-        private float food = 0;
+        private int food = 0;
 
         protected override void Start()
         {
-            Mine.OnMineDestroy += (bool areMines, bool areWorkedMines) =>
-            {
-                if (!areWorkedMines)
-                    fsm.SetCurrentStateForced((int)States.Return);
-            };
+            InitializeFSM();
+            SubscribeToEvents();
+            SetInitialState();
+        }
+
+        private void InitializeFSM()
+        {
             voronoiCalculator = GetComponent<VoronoiController>();
             allParameters = new StateParameters();
 
             fsm = new FSM(Enum.GetValues(typeof(States)).Length, Enum.GetValues(typeof(Flags)).Length);
-
-            fsm.SetRelation((int)States.Return, (int)Flags.OnSuplyMode, (int)States.Suply);
-
-            fsm.SetRelation((int)States.Suply, (int)Flags.OnNeedToReturnHome, (int)States.Return);
-
-            allParameters.Parameters = new object[7] { gameObject.transform, speed, Target, food, Home, travelPositions, voronoiCalculator };
-            fsm.AddState<SuplyState>((int)States.Suply,
-                allParameters, allParameters);
-
-            fsm.AddState<ReturnState>((int)States.Return,
-                allParameters, allParameters);
-
-            fsm.SetCurrentStateForced((int)States.Suply);
-
-            VillagerAdmin.OnEmergencyCalled += () => fsm.SetCurrentStateForced((int)States.Return);
+            ConfigureFSMRelations();
+            ConfigureFSMStates();
         }
 
-        private void OnDestroy()
+        private void ConfigureFSMRelations()
         {
-            VillagerAdmin.OnEmergencyCalled -= () => fsm.SetCurrentStateForced((int)States.Return);
+            fsm.SetRelation((int)States.Return, (int)Flags.OnSupplyMode, (int)States.Suply);
+            fsm.SetRelation((int)States.Suply, (int)Flags.OnNeedToReturnHome, (int)States.Return);
+        }
+
+        private void ConfigureFSMStates()
+        {
+            allParameters.Parameters = new object[7] { gameObject.transform, Speed, Target, food, Home, travelPositions, voronoiCalculator };
+
+            fsm.AddState<SuplyState>((int)States.Suply, allParameters, allParameters);
+            fsm.AddState<ReturnState>((int)States.Return, allParameters, allParameters);
+        }
+
+        private void SetInitialState()
+        {
+            fsm.SetCurrentStateForced((int)States.Suply);
+        }
+
+        protected override int GetReturnState()
+        {
+            return (int)States.Return;
         }
     }
 }

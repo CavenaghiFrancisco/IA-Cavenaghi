@@ -3,6 +3,7 @@ using IA.FSM.Entities.Villager;
 using MinerSimulator.Map;
 using MinerSimulator.Utils.Voronoi;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,17 +11,17 @@ namespace MinerSimulator.Admins
 {
     public class VillagerAdmin : MonoBehaviour
     {
-        public System.Collections.Concurrent.ConcurrentBag<Villager> villagers = new System.Collections.Concurrent.ConcurrentBag<Villager>();
-        public System.Collections.Concurrent.ConcurrentBag<Carriage> carriages = new System.Collections.Concurrent.ConcurrentBag<Carriage>();
+        public ConcurrentBag<Villager> Villagers { get; private set; } = new ConcurrentBag<Villager>();
+        public ConcurrentBag<Carriage> Carriages { get; private set; } = new ConcurrentBag<Carriage>();
 
-        public GameObject villagerPrefab;
-        public GameObject carriagePrefab;
-        public int villagerQuantity = 3;
-        public static int carriageQuantity = 1;
+        public GameObject VillagerPrefab;
+        public GameObject CarriagePrefab;
+        public int VillagerQuantity = 2;
+        public static int CarriageQuantity = 1;
 
-        bool emergency = false;
+        private bool emergency = false;
 
-        public bool Emergency { get => emergency; }
+        public bool Emergency => emergency;
 
         public static Action OnEmergencyCalled;
 
@@ -39,44 +40,50 @@ namespace MinerSimulator.Admins
 
         private void Start()
         {
-            for(int i = 0; i < villagerQuantity; i++) 
-            {
-                GameObject villagerAux = Instantiate(villagerPrefab, transform.position, Quaternion.identity);
-                villagers.Add(villagerAux.GetComponent<Villager>());
-                villagerAux.AddComponent<VoronoiController>().SetVoronoi(MapGenerator.Instance.MinesAvailable);
-                villagerAux.GetComponent<Villager>().Home = this.gameObject;
-                villagerAux.GetComponent<Villager>().Speed = UnityEngine.Random.Range(1,2);
-            }
+            InitializeEntities(VillagerPrefab, Villagers, VillagerQuantity, VillagerQuantity);
+            InitializeEntities(CarriagePrefab, Carriages, CarriageQuantity, CarriageQuantity);
 
-            for (int i = 0; i < carriageQuantity; i++)
+            Parallel.ForEach(Villagers, new ParallelOptions { MaxDegreeOfParallelism = 6}, villager =>
             {
-                GameObject carriageAux = Instantiate(carriagePrefab, transform.position, Quaternion.identity);
-                carriageAux.AddComponent<Carriage>();
-                carriages.Add(carriageAux.GetComponent<Carriage>());
-                carriageAux.AddComponent<VoronoiController>();
-                carriageAux.GetComponent<Carriage>().Home = gameObject;
-                carriageAux.GetComponent<Carriage>().Speed = UnityEngine.Random.Range(7, 10);
-                carriageQuantity--;
-                i--;
-            }
-
-            ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = 32 };
-
-            Parallel.ForEach(villagers, options, currentItem =>
-            {
-                currentItem.Update();
+                villager.Update();
             });
 
-            Parallel.ForEach(carriages, options, currentItem =>
+            Parallel.ForEach(Carriages, new ParallelOptions { MaxDegreeOfParallelism = 6}, carriage =>
             {
-                currentItem.Update();
+                carriage.Update();
             });
+        }
+
+        private void InitializeEntities<T>(GameObject prefab, ConcurrentBag<T> entities, int quantity, int initialQuantity)
+            where T : IA.FSM.Entities.Entity
+        {
+            for (int i = 0; i < quantity; i++)
+            {
+                GameObject entityAux = Instantiate(prefab, transform.position, Quaternion.identity);
+                T entity = entityAux.GetComponent<T>();
+                entities.Add(entity);
+                entityAux.AddComponent<VoronoiController>().SetVoronoi(MapGenerator.Instance.MinesAvailable);
+                entity.Home = this.gameObject;
+                entity.Speed = UnityEngine.Random.Range(1, 2);
+                if (typeof(T) == typeof(Carriage))
+                {
+                    entity.Speed = 6;
+                }
+            }
+
+            quantity -= initialQuantity;
+            initialQuantity -= quantity;
+
+            if(typeof(T) == typeof(Carriage))
+            {
+                CarriageQuantity--;
+            }
         }
 
         public void SetEmergency(bool isEmergency)
         {
             emergency = !isEmergency;
-            OnEmergencyCalled();
+            OnEmergencyCalled?.Invoke();
         }
     }
 }

@@ -1,48 +1,64 @@
-using UnityEngine;
-using System;
-using System.Collections.Generic;
-using MinerSimulator.Utils.Voronoi;
 using IA.FSM.States;
+using MinerSimulator.Admins;
+using MinerSimulator.Entity;
+using MinerSimulator.Map;
+using MinerSimulator.Utils.Voronoi;
+using System;
+using UnityEngine;
 
 namespace IA.FSM.Entities
 {
-    public enum States
-    {
-    }
-
-    public enum Flags
-    {
-    }
-
     public abstract class Entity : MonoBehaviour
     {
-        protected GameObject target;
-        protected GameObject home;
-        protected VoronoiController voronoiCalculator;
-        protected float speed;
         protected FSM fsm;
-        protected List<Vector3> travelPositions;
         protected StateParameters allParameters;
+        protected VoronoiController voronoiCalculator;
 
-        public GameObject Target { get => target; set => target = value; }
+        private float speed;
+        private Transform target;
+        private GameObject home;
+        protected Vector3[] travelPositions;
+
+        public Transform Target { get => target; set => target = value; }
         public GameObject Home { get => home; set => home = value; }
         public float Speed { get => speed; set => speed = value; }
 
-        protected virtual void Start()
-        {
-            voronoiCalculator = GetComponent<VoronoiController>();
-            allParameters = new StateParameters();
-            fsm = new FSM(GetEnumLength<States>(), GetEnumLength<Flags>());
-        }
+        protected abstract void Start();
 
         public void Update()
         {
-            fsm.Update();
+            fsm?.Update();
         }
 
-        private int GetEnumLength<T>()
+        protected virtual void OnDestroy()
         {
-            return Enum.GetValues(typeof(T)).Length;
+            UnsubscribeFromEvents();
         }
+
+        protected void SubscribeToEvents()
+        {
+            Mine.OnMineDestroy += HandleMineDestroy;
+            VillagerAdmin.OnEmergencyCalled += HandleEmergencyCalled;
+        }
+
+        protected void UnsubscribeFromEvents()
+        {
+            Mine.OnMineDestroy -= HandleMineDestroy;
+            VillagerAdmin.OnEmergencyCalled -= HandleEmergencyCalled;
+        }
+
+        protected void HandleMineDestroy(bool areMines, bool areWorkedMines)
+        {
+            if (!areWorkedMines)
+                fsm.SetCurrentStateForced(GetReturnState());
+            voronoiCalculator.SetVoronoi(MapGenerator.Instance.MinesAvailable);
+        }
+
+        protected void HandleEmergencyCalled()
+        {
+            fsm.SetCurrentStateForced(GetReturnState());
+        }
+
+        protected abstract int GetReturnState();
     }
 }
