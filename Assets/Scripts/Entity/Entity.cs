@@ -15,6 +15,7 @@ namespace IA.FSM.Entities
         protected VoronoiController voronoiCalculator;
 
         private float speed;
+        private int resourcesCollected = 0;
         private Transform target;
         private GameObject home;
         protected Vector3[] travelPositions;
@@ -22,6 +23,7 @@ namespace IA.FSM.Entities
         public Transform Target { get => target; set => target = value; }
         public GameObject Home { get => home; set => home = value; }
         public float Speed { get => speed; set => speed = value; }
+        public int ResourcesCollected { get => resourcesCollected; set => resourcesCollected = value; }
 
         protected abstract void Start();
 

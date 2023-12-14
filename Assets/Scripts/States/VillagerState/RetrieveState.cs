@@ -15,7 +15,7 @@ namespace IA.FSM.States.Villager
             Transform transform = stateParameters.GetTransform(0);
             float speed = stateParameters.GetFloat(1);
             GameObject home = stateParameters.GetGameObject(4);
-            float resources = stateParameters.GetFloat(3);
+            int resources = stateParameters.GetInt(3);
             List<Vector3> travelPositions = stateParameters.GetVectorList(5);
 
             List<Action> behaviours = new List<Action>();
@@ -56,13 +56,13 @@ namespace IA.FSM.States.Villager
             SetFlag?.Invoke(flag);
         }
 
-        private void HandleEmergencyBehaviour(StateParameters stateParameters, Transform transform, float resources, GameObject home, List<Vector3> travelPositions)
+        private void HandleEmergencyBehaviour(StateParameters stateParameters, Transform transform, int resources, GameObject home, List<Vector3> travelPositions)
         {
             if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
             {
                 transform.GetComponent<MeshRenderer>().enabled = false;
                 resources = 0;
-                stateParameters.SetFloat(3, resources);
+                stateParameters.SetInt(3, resources);
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace IA.FSM.States.Villager
             }
         }
 
-        private void HandleNormalBehaviour(StateParameters stateParameters, Transform transform, float speed, float resources, GameObject home, List<Vector3> travelPositions)
+        private void HandleNormalBehaviour(StateParameters stateParameters, Transform transform, float speed, int resources, GameObject home, List<Vector3> travelPositions)
         {
             transform.GetComponent<MeshRenderer>().enabled = true;
             travelPositions = stateParameters.GetVectorList(5);
@@ -90,7 +90,7 @@ namespace IA.FSM.States.Villager
                 if (MapGenerator.Instance.MinesAvailable.Count <= 0)
                     return;
                 resources = 0;
-                stateParameters.SetFloat(3, resources);
+                stateParameters.SetInt(3, resources);
                 Transition((int)Flags.OnSeeTarget);
             }
 

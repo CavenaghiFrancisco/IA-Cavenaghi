@@ -2,6 +2,7 @@ using MinerSimulator.Admins;
 using MinerSimulator.Entity;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -141,6 +142,11 @@ namespace MinerSimulator.Map
                     }
                 }
             }
+        }
+
+        public Mine GetMostWorkedMine()
+        {
+            return minesAvailable.OrderBy(node => node.Mined).Last();
         }
 
         private void CreateEntities()

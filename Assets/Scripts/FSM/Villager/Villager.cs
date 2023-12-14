@@ -31,7 +31,6 @@ namespace IA.FSM.Entities.Villager
     public class Villager : Entity
     {
         private int mined = 0;
-        private float resourcesCollected = 0;
 
         protected override void Start()
         {
@@ -64,7 +63,7 @@ namespace IA.FSM.Entities.Villager
 
         private void ConfigureFSMStates()
         {
-            allParameters = new StateParameters { Parameters = new object[8] { gameObject.transform, Speed, Target, resourcesCollected, Home, travelPositions, mined, voronoiCalculator } };
+            allParameters = new StateParameters { Parameters = new object[8] { gameObject.transform, Speed, Target, ResourcesCollected, Home, travelPositions, mined, voronoiCalculator } };
 
             fsm.AddState<MineState>((int)States.Mine, allParameters, allParameters);
             fsm.AddState<RetrieveState>((int)States.Retrieve, allParameters, allParameters);

@@ -17,7 +17,7 @@ namespace IA.FSM.States.Villager
             Transform transform = stateParameters.GetTransform(0);
             float speed = stateParameters.GetFloat(1);
             GameObject target = stateParameters.GetGameObject(2);
-            float resources = stateParameters.GetFloat(3);
+            int resources = stateParameters.GetInt(3);
             List<Vector3> travelPositions = stateParameters.GetVectorList(5);
             int mined = stateParameters.GetInt(6);
             VoronoiController voronoi = stateParameters.GetVoronoi(7);
@@ -25,7 +25,20 @@ namespace IA.FSM.States.Villager
             List<Action> behaviours = new List<Action>();
             behaviours.Add(() =>
             {
-                if (resources >= 15 || MapGenerator.Instance.MinesAvailable.Count <= 0 || VillagerAdmin.Instance.Emergency)
+                Debug.Log(resources);
+                if (target != null)
+                {
+                    if(target.GetComponent<Mine>().CanContinue())
+                    {
+                        resources = 0;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                    
+                if (MapGenerator.Instance.MinesAvailable.Count <= 0 || VillagerAdmin.Instance.Emergency)
                 {
                     Transition((int)Flags.OnHaveEnoughResources);
                     return;
@@ -57,7 +70,7 @@ namespace IA.FSM.States.Villager
                     }
 
                     stateParameters.SetInt(6, mined);
-                    stateParameters.SetFloat(3, resources);
+                    stateParameters.SetInt(3, resources);
                 }
             });
 

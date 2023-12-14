@@ -83,12 +83,15 @@ namespace IA.FSM.States.Carriage
         private void HandleReturnToHome(StateParameters stateParameters, Transform transform, GameObject home, VoronoiController voronoi)
         {
             int food = stateParameters.GetInt(3);
+            int resourcesCollected = stateParameters.GetInt(7);
             List<Vector3> travelPositions = stateParameters.GetVectorList(5);
 
             if (Vector3.Distance(transform.position, home.transform.position) < 1.1f)
             {
                 food = 10;
+                resourcesCollected = 0;
                 stateParameters.SetInt(3, food);
+                stateParameters.SetInt(7, resourcesCollected);
 
                 if (VoronoiController.workdMines.Count <= 0 || VillagerAdmin.Instance.Emergency)
                 {

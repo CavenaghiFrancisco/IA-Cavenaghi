@@ -10,18 +10,21 @@ namespace MinerSimulator.Entity
     public class Mine : MonoBehaviour
     {
 
-        [SerializeField] private int amount = 20;
-        [SerializeField] private int amountFood = 20;
+        [SerializeField] private int amount = 27;
+        [SerializeField] private int amountFood = 27;
         [SerializeField] private TMP_Text amountText = null;
+        
 
         private bool worked = false;
 
-        public static Action<bool,bool> OnMineDestroy;
+        public static Action<bool, bool> OnMineDestroy;
 
+        private int mined = 0;
         private bool isEmpty = false;
 
         public bool IsEmpty { get => isEmpty; }
         public bool Worked { get => worked; }
+        public int Mined { get => mined; set => mined = value; }
 
         public int Take(int substract)
         {
@@ -38,6 +41,7 @@ namespace MinerSimulator.Entity
 
                 SetAmount(amount - substract);
 
+                mined += substract;
                 return substract;
             }
 
@@ -51,10 +55,12 @@ namespace MinerSimulator.Entity
                 amountFood--;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
+        }
+
+        public bool CanContinue()
+        {
+            return mined < 15;
         }
 
         public void SuplyFood(int foodSuply)
@@ -62,12 +68,19 @@ namespace MinerSimulator.Entity
             amountFood += foodSuply;
         }
 
+        public int GetMinedResources()
+        {
+            int aux = mined;
+            mined = 0;
+            return aux;
+        }
+
         private void SetEmpty()
         {
             isEmpty = true;
             MapGenerator.Instance.MinesAvailable.Remove(this);
             Destroy(gameObject);
-            OnMineDestroy?.Invoke(MapGenerator.Instance.MinesAvailable.Count > 0,VoronoiController.workdMines.Count > 0);
+            OnMineDestroy?.Invoke(MapGenerator.Instance.MinesAvailable.Count > 0, VoronoiController.workdMines.Count > 0);
         }
 
         private void SetAmount(int amount)

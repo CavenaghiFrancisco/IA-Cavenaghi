@@ -48,7 +48,7 @@ namespace IA.FSM.Entities.Carriage
 
         private void ConfigureFSMStates()
         {
-            allParameters.Parameters = new object[7] { gameObject.transform, Speed, Target, food, Home, travelPositions, voronoiCalculator };
+            allParameters.Parameters = new object[8] { gameObject.transform, Speed, Target, food, Home, travelPositions, voronoiCalculator, ResourcesCollected };
 
             fsm.AddState<SuplyState>((int)States.Suply, allParameters, allParameters);
             fsm.AddState<ReturnState>((int)States.Return, allParameters, allParameters);

@@ -34,6 +34,16 @@ namespace IA.FSM.States.Carriage
                         stateParameters.SetGameObject(2, target);
                     }
                 }
+                else
+                {
+                    Mine mine = MapGenerator.Instance.GetMostWorkedMine();
+                    if(mine.Mined > 0)
+                    {
+                        target = mine.gameObject;
+                        stateParameters.SetGameObject(2, target);
+                    }
+                }
+                
 
                 if (VillagerAdmin.Instance.Emergency || VoronoiController.workdMines.Count <= 0 || target == null)
                 {
@@ -52,8 +62,10 @@ namespace IA.FSM.States.Carriage
 
                 if (Vector3.Distance(transform.position, target.transform.position) < 1.1f)
                 {
-                    target.GetComponent<Mine>().SuplyFood(food);
+                    Mine mine = target.GetComponent<Mine>();
+                    mine.SuplyFood(food);
                     stateParameters.SetInt(3, 0);
+                    stateParameters.SetInt(7, mine.GetMinedResources());
                     Transition((int)Flags.OnNeedToReturnHome);
                 }
 
